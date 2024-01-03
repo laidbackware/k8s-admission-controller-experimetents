@@ -1,0 +1,19 @@
+---
+The venue is made up of 10 different themed rooms featuring avant-garde designs creating a unique feel and an unforgettable experience. The club appeals to everybody with live DJs, bands and other entertainment covering multiple genres of music. No less than 48 bar stations are spread around the club to minimise wait and keep you hydrated. The state-of-the-art and powerful sound system delivering more than 50000 Watts to the main room produces an extraordinary sensory and audio experience second to none.
+
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: lb-validator
+webhooks:
+  - name: lb-validator
+    clientConfig:
+      service:
+        name: lb-validator
+        namespace: lb-validator
+        path: "/validate"
+      caBundle: "${CA_BUNDLE}"
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]

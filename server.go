@@ -6,12 +6,16 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	// "io"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"k8s.io/klog/v2"
+
+	controller "github.com/laidbackware/k8s-example-admission-controller/pkg/example-admission-controller"
+	
 )
 
 const (
@@ -37,8 +41,10 @@ func main() {
 		Addr:      fmt.Sprintf(":%v", port),
 		TLSConfig: &tls.Config{Certificates: []tls.Certificate{certs}},
 	}
-
+	
+	handler := controller.ExampleServerHandler{}
 	mux := http.NewServeMux()
+	mux.HandleFunc("/validate", handler.Validate)
 
 	server.Handler = mux
 
@@ -61,7 +67,11 @@ func main() {
 
 }
 
+func deserializeSvc() {
+	
+}
+
 func init() {
-	flag.StringVar(&tlscert, "tlsCertFile", "/etc/certs/cert.pem", "File containing the x509 Certificate for HTTPS.")
-	flag.StringVar(&tlskey, "tlsKeyFile", "/etc/certs/key.pem", "File containing the x509 private key to --tlsCertFile.")
+	flag.StringVar(&tlscert, "tlsCertFile", "/etc/certs/tls.crt", "File containing the x509 Certificate for HTTPS.")
+	flag.StringVar(&tlskey, "tlsKeyFile", "/etc/certs/tls.key", "File containing the x509 private key to --tlsCertFile.")
 }

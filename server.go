@@ -67,9 +67,6 @@ func main() {
 
 }
 
-func deserializeSvc() {
-	
-}
 
 func init() {
 	flag.StringVar(&tlscert, "tlsCertFile", "/etc/certs/tls.crt", "File containing the x509 Certificate for HTTPS.")

@@ -2,6 +2,8 @@ package exampleadmissioncontroller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -25,41 +27,51 @@ func (handler *ExampleServerHandler) Validate(writer http.ResponseWriter, r *htt
 		}
 	}
 	if len(body) == 0 {
-		klog.Error("empty body")
-		http.Error(writer, "empty body", http.StatusBadRequest)
+		klog.Error("empty body!")
+		http.Error(writer, "empty body!", http.StatusBadRequest)
 		return
 	}
 	klog.Info("Received request")
 
 	if r.URL.Path != "/validate" {
-		klog.Error("no validate")
-		http.Error(writer, "no validate", http.StatusBadRequest)
+		klog.Error("Invalid endpoint")
+		http.Error(writer, "Invalid endpoint", http.StatusBadRequest)
 		return
 	}
 	
 	svc, err := unmarshalService(body, writer)
 	if err != nil {
+		klog.Error(err)
+		http.Error(writer, fmt.Sprint(err), http.StatusBadRequest)
 		return
 	}
 
 	klog.Info(svc)
+	klog.Error("it works!")
+
+	
 	
 }
 
 func unmarshalService(body []byte, writer http.ResponseWriter) (svc corev1.Service, err error) {
 	arRequest := admissionv1.AdmissionReview{}
 	if err = json.Unmarshal(body, &arRequest); err != nil {
-		klog.Error("incorrect body")
-		http.Error(writer, "incorrect body", http.StatusBadRequest)
+		klog.Error("body if request is not a json object")
+		http.Error(writer, "body if request is not a json object", http.StatusBadRequest)
 		klog.Error(body)
 		return
 	}
 
-	raw := arRequest.Request.Object.Raw
-	svc = corev1.Service{}
-
-	if err = json.Unmarshal(raw, &svc); err != nil {
-		klog.Error("error deserializing service")
+	if arRequest.Request != nil{
+		raw := arRequest.Request.Object.Raw
+		svc = corev1.Service{}
+	
+		if err = json.Unmarshal(raw, &svc); err != nil {
+			klog.Error("error deserializing service")
+		}
+		return
 	}
+	err = errors.New("invalid input. not an admission review object")
+	klog.Error("error deserializing service")
 	return
 }

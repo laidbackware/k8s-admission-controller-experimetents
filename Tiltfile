@@ -17,7 +17,7 @@ if os.name == 'nt':
 local_resource(
   'example-admission-controller-compile',
   compile_cmd,
-  deps=['./server.go'],
+  deps=['./server.go', './pkg/example-admission-controller/*'],
   resource_deps=['deploy'])
 
 docker_build_with_restart(
